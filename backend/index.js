@@ -22,6 +22,8 @@ const Transactions = mongoose.model('transactions', {
   dateOfSale: Date
 });
 
+Transactions.schema.index({ title: 'text', description: 'text' })
+
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
@@ -50,6 +52,16 @@ app.get('/init', (req, res) => {
     }
   })
   res.send('')
+})
+
+app.get('/transactions', async (req, res) => {
+  const offset = parseInt(req.query.offset) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const searchQuery = req.query.q || '';
+  // TODO: validate that offset is >= 1
+  const skip = (offset - 1) * limit;
+  const transactions = await Transactions.find({ $text: { $search: searchQuery } }).limit(limit).skip(skip)
+  res.json({ "response": transactions })
 })
 
 app.listen(port, () => {
