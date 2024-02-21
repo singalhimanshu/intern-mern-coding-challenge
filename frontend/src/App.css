@@ -1,0 +1,37 @@
+.above-table {
+  display: flex;
+  justify-content: space-between;
+  margin-left: 30px;
+  margin-right: 100px;
+}
+
+.data-table {
+  border: 1px solid black;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 30px;
+  margin-left: 30px;
+  margin-right: 100px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  margin-left: 30px;
+  margin-right: 100px;
+  margin-top: 20px;
+}
+
+.pagination-next {
+  color: blue;
+  cursor: pointer;
+}
+
+.pagination-prev {
+  color: blue;
+  cursor: pointer;
+}
+
+.pagination-sep {
+  margin: 15px;
+}
