@@ -167,67 +167,64 @@ const getTextStats = async (matchMonth) => {
 
 const getBarStats = async (matchMonth) => {
   // @@@todo: define ranges in code
+  const ranges = [
+    {
+      low: 0,
+      high: 100,
+    },
+    {
+      low: 101,
+      high: 200,
+    },
+    {
+      low: 201,
+      high: 300,
+    },
+    {
+      low: 301,
+      high: 400,
+    },
+    {
+      low: 401,
+      high: 500,
+    },
+    {
+      low: 501,
+      high: 600,
+    },
+    {
+      low: 601,
+      high: 700,
+    },
+    {
+      low: 701,
+      high: 800,
+    },
+    {
+      low: 801,
+      high: 600,
+    },
+    {
+      low: 901,
+      high: Infinity,
+    },
+  ];
+  const branches = ranges.map((range) => {
+    return {
+      case: {
+        $and: [
+          { $gte: ["$price", range.low] },
+          { $lte: ["$price", range.high] },
+        ],
+      },
+      then: `${range.low}-${range.high}`,
+    };
+  });
   const priceAggregate = {
     $group: {
       _id: {
         $switch: {
-          branches: [
-            {
-              case: {
-                $and: [{ $gte: ["$price", 0] }, { $lte: ["$price", 100] }],
-              },
-              then: "0-100",
-            },
-            {
-              case: {
-                $and: [{ $gte: ["$price", 101] }, { $lte: ["$price", 200] }],
-              },
-              then: "101-200",
-            },
-            {
-              case: {
-                $and: [{ $gte: ["$price", 201] }, { $lte: ["$price", 300] }],
-              },
-              then: "201-300",
-            },
-            {
-              case: {
-                $and: [{ $gte: ["$price", 301] }, { $lte: ["$price", 400] }],
-              },
-              then: "301-400",
-            },
-            {
-              case: {
-                $and: [{ $gte: ["$price", 401] }, { $lte: ["$price", 500] }],
-              },
-              then: "401-500",
-            },
-            {
-              case: {
-                $and: [{ $gte: ["$price", 501] }, { $lte: ["$price", 600] }],
-              },
-              then: "501-600",
-            },
-            {
-              case: {
-                $and: [{ $gte: ["$price", 601] }, { $lte: ["$price", 700] }],
-              },
-              then: "601-700",
-            },
-            {
-              case: {
-                $and: [{ $gte: ["$price", 701] }, { $lte: ["$price", 800] }],
-              },
-              then: "701-800",
-            },
-            {
-              case: {
-                $and: [{ $gte: ["$price", 801] }, { $lte: ["$price", 900] }],
-              },
-              then: "801-900",
-            },
-            { case: { $gte: ["$price", 901] }, then: "901-above" },
-          ],
+          branches: branches,
           default: "Unknown",
         },
       },
@@ -245,11 +242,23 @@ const getBarStats = async (matchMonth) => {
     },
   ]);
   console.log(priceAggregationResult);
-  let priceAggregationResponse = {};
+  let priceAggregationResponseMap = {};
   for (const key in priceAggregationResult) {
     const range = priceAggregationResult[key]["_id"];
     const count = priceAggregationResult[key]["count"];
-    priceAggregationResponse[range] = count;
+    priceAggregationResponseMap[range] = count ? count : 0;
+  }
+  let priceAggregationResponse = [];
+  for (let i = 0; i < ranges.length; i++) {
+    const range = ranges[i];
+    const key = `${range.low}-${range.high}`;
+    const rangeVal = priceAggregationResponseMap[key]
+      ? priceAggregationResponseMap[key]
+      : 0;
+    priceAggregationResponse.push({
+      range: `${range.low}-${range.high}`,
+      count: rangeVal,
+    });
   }
   return priceAggregationResponse;
 };
@@ -260,11 +269,11 @@ const getPieStats = async (matchMonth) => {
     { $project: { category: 1 } },
     { $group: { _id: "$category", totalCount: { $sum: 1 } } },
   ]);
-  let pieResponse = {};
+  let pieResponse = [];
   for (const key in pieResult) {
     const category = pieResult[key]["_id"];
     const count = pieResult[key]["totalCount"];
-    pieResponse[category] = count;
+    pieResponse.push({ count, category });
   }
   return pieResponse;
 };

@@ -2,6 +2,18 @@ import { useEffect, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 const options = [
   { value: 1, text: "Jan" },
@@ -202,6 +214,39 @@ function App() {
               Total not sold items:{" "}
               {statsData.response.textResponse.itemsNotSoldByMonth}
             </p>
+          </div>
+          {JSON.stringify(statsData.response.pieResponse)}
+          <h1>Bar Chart</h1>
+          <div style={{ height: "400px", width: "800px" }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                width={500}
+                height={300}
+                data={statsData.response.barResponse}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="range" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="count" fill="#8884d8" />
+              </BarChart>
+              <h1>Pie Chart</h1>
+              <PieChart width={400} height={400}>
+                <Pie
+                  dataKey="count"
+                  nameKey="category"
+                  data={statsData.response.pieResponse}
+                  isAnimationActive={true}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  fill="#8884d8"
+                  label={({ name, value }) => `${name}: ${value}`}
+                />
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
           </div>
         </div>
       )}
